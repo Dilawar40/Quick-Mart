@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "660971638387",
+    "project_id": "cb-mart-cf875",
+    "storage_bucket": "cb-mart-cf875.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:660971638387:android:907f0b5e1a85e4f9982406",
+        "android_client_info": {
+          "package_name": "com.cbmart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYVd42wEVmx0jMQSQXJZKlmX6986kH8a4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

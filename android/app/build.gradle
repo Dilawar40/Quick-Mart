@@ -1,0 +1,101 @@
+apply plugin: "com.android.application"
+apply plugin: "com.facebook.react"
+apply plugin: 'com.google.gms.google-services'
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+
+/**
+ * This is the configuration block to customize your React Native Android app.
+ */
+react {
+    /* If you encounter any issues with bundling or code generation, you can uncomment and customize these settings */
+    // root = file("../")
+    // reactNativeDir = file("../node_modules/react-native")
+    // codegenDir = file("../node_modules/@react-native/codegen")
+    // cliFile = file("../node_modules/react-native/cli.js")
+}
+
+/**
+ * Set this to true to enable Proguard in Release builds.
+ * Note: Proguard shrinks and obfuscates code, potentially reducing APK size.
+ */
+def enableProguardInReleaseBuilds = false
+def jscFlavor = 'org.webkit:android-jsc:+'
+
+android {
+    ndkVersion rootProject.ext.ndkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    namespace "com.cbmart"
+    defaultConfig {
+        applicationId "com.cbmart"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0.0"
+
+        // Enable Hermes if specified in gradle.properties (and the project supports it)
+        if (project.hasProperty("hermesEnabled") && hermesEnabled.toBoolean()) {
+            def hermesFlagsRelease = ["-O", "-emit-binary"]
+            project.ext.react = [
+                enableHermes: true,  // Hermes is enabled.
+                hermesFlagsRelease: hermesFlagsRelease
+            ]
+        }
+    }
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            // Use environment variables for sensitive information or properties
+            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                storePassword System.getenv("MYAPP_STORE_PASSWORD") ?: 'default_store_password'
+                keyAlias System.getenv("MYAPP_KEY_ALIAS") ?: 'default_key_alias'
+                keyPassword System.getenv("MYAPP_KEY_PASSWORD") ?: 'default_key_password'
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
+        }
+    }
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libjsc.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+    }
+}
+
+dependencies {
+    implementation "com.facebook.react:react-android"
+    implementation platform('com.google.firebase:firebase-bom:32.4.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation project(':react-native-fs')
+
+    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
+    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+    }
+    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
+
+    // Conditional dependency for Hermes
+    if (project.hasProperty("hermesEnabled") && hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        implementation jscFlavor
+    }
+}
+
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); 
+applyNativeModulesAppBuildGradle(project)
